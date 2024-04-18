@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Video Player</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- MKPlayer -->
+    <script src="https://cdn.jsdelivr.net/gh/aksfsolutions/test/mkplayer.js"></script>
+    <link rel="stylesheet" href="mkplayer/mkplayer-ui.css">
+</head>
+
+<body>
+    <div>
+        <div style="height: 0; width: 100%; overflow: hidden; position: relative; padding-top: 56.25%; background-color: #000;"
+            id="video-container">
+        </div>
+    </div>
+
+    <script>
+        console.log('script loaded');
+        // *** index.js ***
+        // 1. Grab the video container
+        const videoContainer = document.getElementById("video-container");
+
+        // 2. Prepare the player configuration
+        const playerConfig = {
+            key: "d0167b1c-9767-4287-9ddc-e0fa09d31e02",
+            ui: true,
+            playback: {
+                muted: true,
+                autoplay: true
+            },
+            //  tweaks: {
+            //     app_id: "mvn3mr.csb.app",
+            //     enable_seek_for_live: true,
+            //     fairplay_ignore_duplicate_init_data_key_errors: true,
+            //     file_protocol: true,
+            //     native_hls_parsing: true,
+            //  },
+            // Subscribe to player events
+            events: {
+                [mkplayer.MKPlayerEvent.Error]: (event) =>
+                {
+                    console.log("Encountered player error: ", JSON.stringify(event));
+                },
+                [mkplayer.MKPlayerEvent.TimeChanged]: (event) =>
+                {
+                    console.log("Current player position: ", event.time);
+                }
+            }
+        };
+
+
+        console.log('playerConfig', playerConfig)
+        console.log('videoContainer', videoContainer);
+        console.log('mkplayer', mkplayer.MKPlayer);
+
+        // 3. Initialize the player with video container and player configuration
+        let player = new mkplayer.MKPlayer(videoContainer, playerConfig);
+
+        player.on(mkplayer.MKPlayerEvent.SourceLoaded, (event) =>
+        {
+            console.log("Source loaded successfully!");
+        });
+
+        player.on(mkplayer.MKPlayerEvent.Ready, (event) =>
+        {
+            console.log("Player is ready for playback!");
+        });
+        const sourceConfig = {
+            title: "Title for your source",
+            description: "Brief description of your source",
+            hls: "https://mkplayer.azureedge.net/$web/streams/slate/hls/index.m3u8",
+        };
+        player.load(sourceConfig)
+            .then(() =>
+            {
+                // you can also get notified when subscribed to SourceLoaded event.
+                console.log("Source loaded successfull!");
+            })
+            .catch((error) =>
+            {
+                console.error("An error occurred while loading the source!");
+            });
+    </script>
+</body>
+
+</html>
